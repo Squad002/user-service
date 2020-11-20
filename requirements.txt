@@ -1,0 +1,2 @@
+connexion[swagger-ui]==2.7.0
+Flask-Sqlalchemy==2.4.4
