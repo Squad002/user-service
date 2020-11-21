@@ -1,6 +1,6 @@
 from datetime import datetime
 from microservice import db
-from microservice.models import AbstractUser, User, Mark
+from microservice.models import AbstractUser, Operator, Mark
 
 import logging
 
@@ -26,10 +26,13 @@ class HealthAuthority(AbstractUser):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
-    def mark(self, user: User, duration=14, starting_date=datetime.utcnow()):
+    def mark(self, user: Operator, duration=14, starting_date=datetime.utcnow()):
         logger.info(
             f"Authority (id={self.id}, name={self.name}) just marked the user (ID={user.id}, firstname={user.firstname})"
         )
         self.marks.append(
             Mark(user=user, authority=self, duration=duration, created=starting_date)
         )
+
+    def serialize(self, keys):
+        return dict([(k, v) for k, v in self.__dict__.items() if k in keys])

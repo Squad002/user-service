@@ -140,4 +140,4 @@ cython_debug/
 
 .vscode
 todo.md
-users.db
+*.db

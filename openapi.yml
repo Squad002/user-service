@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: API Users
+  title: API User
   version: "1.0"
   description: This is the service the manages the user data in the app GoOutSafe
 servers:
@@ -9,9 +9,84 @@ servers:
     description: The first server used for the definition of APIs
 paths:
   /users:
+    get:
+      x-openapi-router-controller: microservice.api.users
+      summary: "Search users"
+      parameters:
+        - in: query
+          name: id
+          required: false
+          description: The id of the user
+          schema:
+            type: integer
+        - in: query
+          name: firstname
+          required: false
+          description: The firstname of the users
+          schema:
+            type: string
+        - in: query
+          name: lastname
+          required: false
+          description: The lastname of the users
+          schema:
+            type: string
+        - in: query
+          name: fiscalcode
+          required: false
+          description: The fiscalcode of the user
+          schema:
+            type: string
+        - in: query
+          name: phonenumber
+          required: false
+          description: The phonenumber of the users
+          schema:
+            type: string
+        - in: query
+          name: email
+          required: false
+          description: The email of the user
+          schema:
+            type: string
+        - in: query
+          name: birthdate
+          required: false
+          description: The birthdate of the users
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Users list"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+              example:
+                [
+                  {
+                    "id": 5,
+                    "email": "mariorossi@example.com",
+                    "firstname": "Mario",
+                    "lastname": "Rossi",
+                    "birthdate": "2020-12-31",
+                    "phonenumber": "+39 33133133130",
+                    "fiscalcode": "RSSMAR80A01B519J",
+                  },
+                  {
+                    "id": 7,
+                    "email": "caiomaio@example.com",
+                    "firstname": "Caio",
+                    "lastname": "Maio",
+                    "birthdate": "2020-05-21",
+                    "phonenumber": "+39 33133136541",
+                    "fiscalcode": "CAOMAI80A01B519J",
+                  },
+                ]
+      tags:
+        - "User"
     post:
       x-openapi-router-controller: microservice.api.users
-      operationId: bucchino
       summary: "Register a new user"
       requestBody:
         required: true
@@ -50,7 +125,7 @@ paths:
                 "firstname": "Mario"
                 "lastname": "Rossi"
                 "email": "mariorossi@example.com"
-                "fiscal_code": "RSSMRA20T31H501W"
+                "fiscalcode": "RSSMRA20T31H501W"
                 "phonenumber": "+39 33133133130"
                 "birthdate": "2020-12-31"
         "404":
@@ -78,7 +153,7 @@ paths:
               "firstname": "Mario"
               "lastname": "Rossi"
               "email": "mariorossi@newemail.com"
-              "fiscal_code": "RSSMRA20T31H501W"
+              "fiscalcode": "RSSMRA20T31H501W"
               "phonenumber": "+39 3303303303300"
       responses:
         "204":
@@ -105,33 +180,7 @@ paths:
           description: "User not found"
       tags:
         - "User"
-  /users/{id}/mark:
-    get:
-      x-openapi-router-controller: microservice.api.users
-      operationId: pippo
-      summary: "Get if the user is marked"
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: The id of the user
-          schema:
-            $ref: "#/components/schemas/User/properties/id"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                properties:
-                  marked:
-                    type: boolean
-              example:
-                "marked": true
-        "404":
-          description: "User not found"
-      tags:
-        - "User"
+
   /operators:
     post:
       x-openapi-router-controller: microservice.api.operators
@@ -152,6 +201,7 @@ paths:
           description: "Already exists"
       tags:
         - "Operator"
+
   /operators/{id}:
     get:
       summary: "Get the operator specified by ID"
@@ -211,7 +261,7 @@ paths:
         "204":
           description: "Operator information modified"
         "404":
-          description: "User not found"
+          description: "Operator not found"
       tags:
         - "Operator"
     delete:
@@ -255,7 +305,6 @@ paths:
           description: "Default error sample response"
       tags:
         - "Health Authority"
-
   /authorities/mark:
     post:
       summary: "Mark an user"
@@ -267,7 +316,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              $ref: "#/components/schemas/Operator"
             examples:
               "Phone number":
                 value:
@@ -282,7 +331,7 @@ paths:
         "204":
           description: "Marked"
         "404":
-          description: "User not found"
+          description: "Operator not found"
       tags:
         - "Health Authority"
 
@@ -317,19 +366,13 @@ paths:
                   },
                 ]
         "404":
-          description: "User not found"
+          description: "Operator not found"
       tags:
         - "Health Authority"
 
 components:
   schemas:
     User:
-      required:
-        - id
-        - firstname
-        - lastname
-        - email
-        - fiscal_code
       type: object
       properties:
         id:
@@ -338,12 +381,12 @@ components:
           readOnly: true
           example: 5
         firstname:
-          type: "string"
+          type: string
           description: The first name of the user
           maxLength: 128
           example: "Mario"
         lastname:
-          type: "string"
+          type: string
           description: The last name of the user
           maxLength: 128
           example: "Rossi"
@@ -357,7 +400,7 @@ components:
           description: The password of the user
           maxLength: 128
           example: "ekjc39rf$nj"
-        fiscal_code:
+        fiscalcode:
           type: string
           description: The fiscal code of the user
           maxLength: 128
@@ -371,16 +414,11 @@ components:
           type: string
           description: The date of birth of the user
           example: "2020-12-31"
+        marked:
+          type: boolean
+          description: "Flag for positiveness to COVID-19"
+          example: true
     Operator:
-      required:
-        - id
-        - password
-        - email
-        - firstname
-        - lastname
-        - birthdate
-        - phonenumber
-        - fiscalcode
       type: object
       properties:
         id:
@@ -422,17 +460,6 @@ components:
           maxLength: 128
           example: "Rossi"
     HealthAuthority:
-      required:
-        - id
-        - email
-        - name
-        - password
-        - phone
-        - country
-        - state
-        - city
-        - lat
-        - lon
       type: object
       properties:
         id:

@@ -11,9 +11,9 @@ class User(AbstractUser):
     firstname = db.Column(db.Unicode(128), nullable=False)
     lastname = db.Column(db.Unicode(128))
     password_hash = db.Column(db.Unicode(128))
-    fiscal_code = db.Column(db.Unicode(128))
+    fiscalcode = db.Column(db.Unicode(128))
     email = db.Column(db.Unicode(128))
-    phone_number = db.Column(db.Unicode(40))
+    phonenumber = db.Column(db.Unicode(40))
     birthdate = db.Column(db.DateTime)
 
     marks = db.relationship("Mark", back_populates="user")
@@ -34,18 +34,16 @@ class User(AbstractUser):
         Returns:
             bool: boolean value
         """
-        if self.marks:
-            return True
-        else:
-            False
+        return True if self.marks else False
 
-    def is_marked(self) -> bool:
+    @property
+    def marked(self) -> str:
         """Returns weather the user is currently marked.
 
         Returns:
             bool: boolean value
         """
-        return self.has_been_marked() and self.get_remaining_mark_days() > 0
+        return str(self.has_been_marked() and self.get_remaining_mark_days() > 0)
 
     def get_last_mark(self):
         """
@@ -56,17 +54,27 @@ class User(AbstractUser):
         Returns:
             Mark: the last one that has been done.
         """
-        return max(self.marks, key=lambda mark: mark.created)
+        return max(self.marks, key=lambda mark: mark.created, default=None)
 
     def get_last_mark_duration(self):
-        return self.get_last_mark().duration
+        last_mark = self.get_last_mark()
+        return last_mark.duration if last_mark else -1
 
     def get_mark_expiration_date(self, from_date=datetime.utcnow()) -> datetime:
         last_mark = self.get_last_mark()
-        return last_mark.created + timedelta(days=last_mark.duration + 1)
+        return (
+            (last_mark.created + timedelta(days=last_mark.duration + 1))
+            if last_mark
+            else None
+        )
 
     def get_remaining_mark_days(self, from_date=datetime.utcnow()):
-        return (self.get_mark_expiration_date() - from_date).days - 1
+        mark_expiration_date = self.get_mark_expiration_date()
+        return (
+            ((mark_expiration_date - from_date).days - 1)
+            if mark_expiration_date
+            else -1
+        )
 
     def has_been_deleted(self) -> bool:
         """Returns weather the user has unsubscribed
@@ -104,5 +112,12 @@ class User(AbstractUser):
 
         return current_app.config["AVATAR_PROVIDER"].format(seed=self.avatar_id)
 
-    def serialize(self):
-        return dict([(k, v) for k, v in self.__dict__.items() if k[0] != "_"])
+    def serialize(self, keys=None):
+        tmp = self.__dict__
+        tmp["marked"] = self.marked
+        if not keys:
+            keys = tmp.keys()
+
+        return dict(
+            [(k, v) for k, v in tmp.items() if k in keys and not k.startswith("_")]
+        )

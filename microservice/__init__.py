@@ -1,35 +1,34 @@
-import logging
+from connexion.resolver import RestyResolver
+from flask_sqlalchemy import SQLAlchemy
+from config import config
 
 import connexion
-from flask_sqlalchemy import SQLAlchemy
 
-from connexion.resolver import RestyResolver
-
-
-logging.basicConfig(level=logging.INFO)
-connexion_app = connexion.App(__name__, specification_dir="../")
 
 db = SQLAlchemy()
 
 
-def create_app():
-    # Get the underlying Flask app instance
+def create_app(config_name, updated_variables=None):
+    connexion_app = connexion.App(__name__, specification_dir="../")
+
+    # Get the underlying Flask app instance and put config in it
     flask_app = connexion_app.app
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
-    flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    flask_app.config.from_object(config[config_name])
+    if updated_variables:
+        flask_app.config.update(updated_variables)
 
+    config[config_name].init_app(flask_app)
+    context = flask_app.app_context()
+    context.push()
 
-from microservice.models.user import User
+    # Database init
+    from microservice.models import User, Operator
 
-db.create_all(app=flask_app)
+    db.init_app(flask_app)
+    db.create_all(app=flask_app)
 
+    # Load APIs
+    connexion_app.add_api("openapi.yml", resolver=RestyResolver("microservice.api"))
+    flask_app.logger.info("Booting up")
 
-connexion_app.add_api("openapi.yml")  # , resolver=RestyResolver("microservice.api"))
-
-
-new_user = db.session.query(User.id).filter_by(email="mammt").first()
-print(new_user)
-
-if __name__ == "__main__":
-    # run our standalone gevent server
-    connexion_app.run(port=8080)
+    return flask_app, connexion_app

@@ -1,0 +1,1 @@
+[![Build Status](https://travis-ci.org/Squad002/user-service.svg?branch=main)](https://travis-ci.org/Squad002/user-service)
