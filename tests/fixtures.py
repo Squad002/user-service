@@ -12,7 +12,6 @@ def app(testrun_uid):
             "SQLALCHEMY_DATABASE_URI": f"sqlite:///gooutsafe_test_{testrun_uid}.db"
         },
     )
-    print("prova")
     db_path = os.path.join(app.root_path, f"gooutsafe_test_{testrun_uid}.db")
 
     yield app

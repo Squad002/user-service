@@ -1,2 +1,4 @@
 connexion[swagger-ui]==2.7.0
 Flask-Sqlalchemy==2.4.4
+python-dotenv==0.15.0
+Pymysql==0.10.1
