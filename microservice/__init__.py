@@ -14,6 +14,7 @@ def create_app(config_name, updated_variables=None):
     # Get the underlying Flask app instance and put config in it
     flask_app = connexion_app.app
     flask_app.config.from_object(config[config_name])
+
     if updated_variables:
         flask_app.config.update(updated_variables)
 

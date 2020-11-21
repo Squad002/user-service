@@ -12,6 +12,9 @@ WORKDIR /home/gooutsafe
 # Install dependencies
 COPY requirements/ requirements/
 RUN python -m venv venv
+RUN apk add --no-cache gcc musl-dev libffi-dev openssl-dev python3-dev && \
+    venv/bin/pip install --no-cache-dir cryptography==3.2.1 && \
+    apk del gcc musl-dev libffi-dev openssl-dev python3-dev
 RUN venv/bin/pip install -r requirements/docker.txt 
 
 # Move code
@@ -22,10 +25,6 @@ COPY app.py config.py boot.sh openapi.yml ./
 RUN chown -R gooutsafe:gooutsafe ./
 RUN chmod a+x boot.sh
 
-RUN apk add curl
-
 EXPOSE 5000
 USER gooutsafe
 ENTRYPOINT [ "./boot.sh" ]
-
-# todo rimuoveree db

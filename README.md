@@ -17,7 +17,7 @@
 
 ### Docker Image
     docker build -t gooutsafe-user-service:latest . 
-    docker run gooutsafe-user-service -p 5000:5000
+    docker run -p 5000:5000 gooutsafe-user-service 
 
 ## Tests with coverage
 Inside user-service run (it will automatically use the configuration in pyproject.toml):
