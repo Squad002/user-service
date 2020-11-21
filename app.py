@@ -11,9 +11,6 @@ if os.path.exists(dotenv_path):
 app, connexion_app = create_app(os.getenv("FLASK_CONFIG") or "default")
 app.logger.info("Botting finished")
 
-# if __name__ == "__main__":
-#     connexion_app.run(port=8080)
-
 
 @app.cli.command()
 def deploy():
