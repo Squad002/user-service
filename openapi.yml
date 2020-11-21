@@ -299,10 +299,8 @@ paths:
       responses:
         "201":
           description: "Health authority created"
-        "400":
-          description: "Bad syntax"
-        default:
-          description: "Default error sample response"
+        "409":
+          description: "Already Exist"
       tags:
         - "Health Authority"
   /authorities/mark:
