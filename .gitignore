@@ -141,3 +141,4 @@ cython_debug/
 .vscode
 todo.md
 *.db
+cov.xml
