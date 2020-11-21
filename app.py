@@ -9,7 +9,7 @@ if os.path.exists(dotenv_path):
 
 
 app, connexion_app = create_app(os.getenv("FLASK_CONFIG") or "default")
-app.logger.info("Botting finished")
+app.logger.info("Booting finished")
 
 
 @app.cli.command()

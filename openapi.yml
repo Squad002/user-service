@@ -483,7 +483,7 @@ components:
           maxLength: 128
           example: password
         phone:
-          type: integer
+          type: string
           description: The phone number of the Health Authority
           maxLength: 40
           example: +39 33133133130
@@ -503,12 +503,12 @@ components:
           maxLength: 128
           example: Pisa
         lat:
-          type: integer
+          type: number
           description: Latitude of the Health Authority
           maxLength: 40
           example: 324234.32
         lon:
-          type: integer
+          type: number
           description: Longitude of the Health Authority
           maxLength: 40
           example: 324234.32
