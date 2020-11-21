@@ -308,7 +308,7 @@ paths:
       summary: "Mark an user"
       description: "Mark a user through their phone number, their email, or their fiscal code."
       x-openapi-router-controller: microservice.api.authorities
-      operationId: prova
+      operationId: mark
       requestBody:
         required: true
         content:
@@ -318,13 +318,13 @@ paths:
             examples:
               "Phone number":
                 value:
-                  "identification": "3323498234"
+                  "phone": "3323498234"
               "Fiscal code":
                 value:
-                  "identification": "CZZPLL84F08K555L"
+                  "fiscalcode": "CZZPLL84F08K555L"
               "Email":
                 value:
-                  "identification": "czzpll@gmail.com"
+                  "email": "czzpll@gmail.com"
       responses:
         "204":
           description: "Marked"

@@ -1,11 +1,19 @@
 from microservice import db
-from microservice.models import HealthAuthority
+from microservice.models import HealthAuthority, User
 from connexion import request
 from flask import Response
 
 def mark():
-    pass
-
+    request.get_data()
+    identification = request.json
+    if identification["phone"]:
+        user = db.session.query(User).filter_by(phone=identification["phone"]).first()
+    elif identification["fiscalcode"]:
+        user = db.session.query(User).filter_by(fiscalcode=identification["fiscalcode"]).first()
+    elif identification["email"]:
+        user = db.session.query(User).filter_by(email=identification["email"]).first()
+    
+    # user.mark?? come lo implementiamo?
 
 def trace():
     pass
