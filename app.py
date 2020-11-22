@@ -1,7 +1,8 @@
 from microservice import create_app
+from dotenv import load_dotenv
+from microservice.services import mock
 
 import os
-from dotenv import load_dotenv
 
 dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 if os.path.exists(dotenv_path):
@@ -15,4 +16,4 @@ app.logger.info("Booting finished")
 @app.cli.command()
 def deploy():
     """Run deployment tasks."""
-    pass
+    mock.everything()

@@ -303,33 +303,43 @@ paths:
           description: "Already Exist"
       tags:
         - "Health Authority"
-  /authorities/mark:
+  /authorities/{id}/mark:
     post:
       summary: "Mark an user"
-      description: "Mark a user through their phone number, their email, or their fiscal code."
+      description: "Mark a user through one of the following identifiers: phone number, email, or fiscal code."
       x-openapi-router-controller: microservice.api.authorities
       operationId: mark
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the health authority
+          schema:
+            $ref: "#/components/schemas/HealthAuthority/properties/id"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Operator"
+              $ref: "#/components/schemas/Mark"
             examples:
               "Phone number":
                 value:
-                  "phone": "3323498234"
+                  "identifier": "+39 3313313310"
+                  "duration": 10
               "Fiscal code":
                 value:
-                  "fiscalcode": "CZZPLL84F08K555L"
+                  "identifier": "MARRSS84F08K555L"
+                  "duration": 15
               "Email":
                 value:
-                  "email": "czzpll@gmail.com"
+                  "identifier": "mariorossi@example.com"
+                  "duration": 7
       responses:
         "204":
           description: "Marked"
         "404":
-          description: "Operator not found"
+          description: "User not found"
       tags:
         - "Health Authority"
 
@@ -510,3 +520,16 @@ components:
           description: Longitude of the Health Authority
           maxLength: 40
           example: 324234.32
+    Mark:
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: Unique identifier
+          example: "+39 3313313310"
+        duration:
+          type: number
+          description: The amount of days the mark must last
+          minimum: 1
+          maximum: 60
+          example: "10"
