@@ -13,7 +13,7 @@ class HealthAuthority(AbstractUser):
     email = db.Column(db.Unicode(128))
     name = db.Column(db.Unicode(128))
     password_hash = db.Column(db.Unicode(128))
-    phone = db.Column(db.Unicode(40))
+    phonenumber = db.Column(db.Unicode(40))
 
     country = db.Column(db.Unicode(128))
     state = db.Column(db.Unicode(128))

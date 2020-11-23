@@ -16,8 +16,8 @@
     flask run
 
 ### Docker Image
-    docker build -t gooutsafe-user-service:latest . 
-    docker run -p 5000:5000 gooutsafe-user-service 
+    docker build -t user-service:latest . 
+    docker run -p 5000:5000 user-service 
 
 ## Tests with coverage
 Inside user-service run (it will automatically use the configuration in pyproject.toml):

@@ -1,9 +1,10 @@
 from microservice import db
 from microservice.models.timestamp_mixin import TimestampMixin
+from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
-class AbstractUser(TimestampMixin, db.Model):
+class AbstractUser(db.Model, TimestampMixin, UserMixin):
     __abstract__ = True
 
     is_registered = db.Column(db.Boolean(), default=False)

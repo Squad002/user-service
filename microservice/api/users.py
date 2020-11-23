@@ -26,6 +26,7 @@ def search():
                     "phonenumber",
                     "birthdate",
                     "marked",
+                    "is_registered",
                 ]
             )
             for user in query.all()
@@ -117,3 +118,24 @@ def delete(id):
         return Response(status=204)
 
     return Response(status=404)
+
+
+def login():
+    request.get_data()
+    user = request.json
+
+    email = user["email"]
+    password = user["password"]
+
+    user = db.session.query(User).filter_by(email=email).first()
+    if user:
+        message = "Success" if user.verify_password(password) else "Wrong credentials"
+        return Response(
+            dumps({"message": message}), status=200, mimetype="application/json"
+        )
+    else:
+        return Response(
+            dumps({"message": "User not found"}),
+            status=404,
+            mimetype="application/json",
+        )

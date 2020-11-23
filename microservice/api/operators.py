@@ -6,6 +6,35 @@ from connexion import request
 from datetime import datetime
 
 
+def search():
+    request.get_data()
+    req_data = request.args
+
+    query = db.session.query(Operator)
+    for attr, value in req_data.items():
+        query = query.filter(getattr(Operator, attr) == value)
+
+    operators = dumps(
+        [
+            operator.serialize(
+                [
+                    "id",
+                    "firstname",
+                    "lastname",
+                    "email",
+                    "fiscalcode",
+                    "phonenumber",
+                    "birthdate",
+                    "is_registered",
+                ]
+            )
+            for operator in query.all()
+        ]
+    )
+
+    return Response(operators, status=200, mimetype="application/json")
+
+
 def post():
     request.get_data()
     operator = request.json
@@ -93,3 +122,24 @@ def delete(id):
         return Response(status=204)
 
     return Response(status=404)
+
+
+def login():
+    request.get_data()
+    user = request.json
+
+    email = user["email"]
+    password = user["password"]
+
+    user = db.session.query(Operator).filter_by(email=email).first()
+    if user:
+        message = "Success" if user.verify_password(password) else "Wrong credentials"
+        return Response(
+            dumps({"message": message}), status=200, mimetype="application/json"
+        )
+    else:
+        return Response(
+            dumps({"message": "Operator not found"}),
+            status=404,
+            mimetype="application/json",
+        )

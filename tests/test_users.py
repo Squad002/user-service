@@ -161,6 +161,43 @@ def test_delete_should_not_be_successful(client):
     assert res.status_code == 404
 
 
+def test_login_should_be_successful(client):
+    client.post(
+        "/users",
+        json=user,
+    )
+
+    res = client.post(
+        "/users/login", json={"email": user["email"], "password": user["password"]}
+    )
+
+    assert res.status_code == 200
+    assert res.json["message"] == "Success"
+
+
+def test_login_should_be_wrong_credentials(client):
+    client.post(
+        "/users",
+        json=user,
+    )
+
+    res = client.post(
+        "/users/login", json={"email": user["email"], "password": "wrongpass"}
+    )
+
+    assert res.status_code == 200
+    assert res.json["message"] == "Wrong credentials"
+
+
+def test_login_should_be_user_not_found(client):
+    res = client.post(
+        "/users/login", json={"email": user["email"], "password": user["password"]}
+    )
+
+    assert res.status_code == 404
+    assert res.json["message"] == "User not found"
+
+
 # Helpers
 
 user = dict(

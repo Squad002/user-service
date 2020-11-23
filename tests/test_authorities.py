@@ -37,9 +37,51 @@ def test_post_should_be_unsuccessful(client, db):
 
     assert res.status_code == 409
 
+
+def test_login_should_be_successful(client):
+    client.post(
+        "/authorities",
+        json=authority,
+    )
+
+    res = client.post(
+        "/authorities/login",
+        json={"email": authority["email"], "password": authority["password"]},
+    )
+
+    assert res.status_code == 200
+    assert res.json["message"] == "Success"
+
+
+def test_login_should_be_wrong_credentials(client):
+    client.post(
+        "/authorities",
+        json=authority,
+    )
+
+    res = client.post(
+        "/authorities/login",
+        json={"email": authority["email"], "password": "wrongpass"},
+    )
+
+    assert res.status_code == 200
+    assert res.json["message"] == "Wrong credentials"
+
+
+def test_login_should_be_authority_not_found(client):
+    res = client.post(
+        "/authorities/login",
+        json={"email": authority["email"], "password": authority["password"]},
+    )
+
+    assert res.status_code == 404
+    assert res.json["message"] == "Authority not found"
+
+
 # Helpers
 
-authority = {"email": "authority@gmail.com",
+authority = {
+    "email": "authority@gmail.com",
     "name": "ASL Pisa",
     "password": "password",
     "phone": "+39 33133133130",
@@ -47,5 +89,5 @@ authority = {"email": "authority@gmail.com",
     "state": "Tuscany",
     "city": "Pisa",
     "lat": 324234.32,
-    "lon": 324234.32
+    "lon": 324234.32,
 }

@@ -180,8 +180,119 @@ paths:
           description: "User not found"
       tags:
         - "User"
+  /users/login:
+    post:
+      x-openapi-router-controller: microservice.api.users
+      operationId: login
+      summary: "Check if the user can login"
+      requestBody:
+        $ref: "#/components/requestBodies/login"
+      responses:
+        "200":
+          description: "User exists"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              examples:
+                "Success":
+                  value:
+                    "message": "Success"
+                "Wrong credentials":
+                  value:
+                    "message": "Wrong credentials"
+        "404":
+          description: "User does not exist"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              example:
+                "message": "User not found"
+      tags:
+        - "User"
 
   /operators:
+    get:
+      x-openapi-router-controller: microservice.api.operators
+      summary: "Search operators"
+      parameters:
+        - in: query
+          name: id
+          required: false
+          description: The id of the operator
+          schema:
+            type: integer
+        - in: query
+          name: firstname
+          required: false
+          description: The firstname of the operator
+          schema:
+            type: string
+        - in: query
+          name: lastname
+          required: false
+          description: The lastname of the operator
+          schema:
+            type: string
+        - in: query
+          name: fiscalcode
+          required: false
+          description: The fiscalcode of the operator
+          schema:
+            type: string
+        - in: query
+          name: phonenumber
+          required: false
+          description: The phonenumber of the operator
+          schema:
+            type: string
+        - in: query
+          name: email
+          required: false
+          description: The email of the operator
+          schema:
+            type: string
+        - in: query
+          name: birthdate
+          required: false
+          description: The birthdate of the operator
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Operators list"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Operator"
+              example:
+                [
+                  {
+                    "id": 5,
+                    "email": "mariorossi@example.com",
+                    "firstname": "Mario",
+                    "lastname": "Rossi",
+                    "birthdate": "2020-12-31",
+                    "phonenumber": "+39 33133133130",
+                    "fiscalcode": "RSSMAR80A01B519J",
+                  },
+                  {
+                    "id": 7,
+                    "email": "caiomaio@example.com",
+                    "firstname": "Caio",
+                    "lastname": "Maio",
+                    "birthdate": "2020-05-21",
+                    "phonenumber": "+39 33133136541",
+                    "fiscalcode": "CAOMAI80A01B519J",
+                  },
+                ]
+      tags:
+        - "Operator"
     post:
       x-openapi-router-controller: microservice.api.operators
       operationId: post
@@ -201,7 +312,6 @@ paths:
           description: "Already exists"
       tags:
         - "Operator"
-
   /operators/{id}:
     get:
       summary: "Get the operator specified by ID"
@@ -283,8 +393,124 @@ paths:
           description: "Operator not found"
       tags:
         - "Operator"
+  /operators/login:
+    post:
+      x-openapi-router-controller: microservice.api.operators
+      operationId: login
+      summary: "Check if the operator can login"
+      requestBody:
+        $ref: "#/components/requestBodies/login"
+      responses:
+        "200":
+          description: "Operator exists"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              examples:
+                "Success":
+                  value:
+                    "message": "Success"
+                "Wrong credentials":
+                  value:
+                    "message": "Wrong credentials"
+        "404":
+          description: "Operator does not exist"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              example:
+                "message": "Operator not found"
+      tags:
+        - "Operator"
 
   /authorities:
+    get:
+      x-openapi-router-controller: microservice.api.authorities
+      summary: "Search authorities"
+      parameters:
+        - in: query
+          name: id
+          required: false
+          description: The id of the health authority
+          schema:
+            type: integer
+        - in: query
+          name: name
+          required: false
+          description: The name of the health authority
+          schema:
+            type: string
+        - in: query
+          name: phonenumber
+          required: false
+          description: The phonenumber of the health authority
+          schema:
+            type: string
+        - in: query
+          name: email
+          required: false
+          description: The email of the health authority
+          schema:
+            type: string
+        - in: query
+          name: country
+          required: false
+          description: The country of the health authority
+          schema:
+            type: string
+        - in: query
+          name: state
+          required: false
+          description: The state of the health authority
+          schema:
+            type: string
+        - in: query
+          name: city
+          required: false
+          description: The city of the health authority
+          schema:
+            type: string
+        - in: query
+          name: lat
+          required: false
+          description: The latitude of the health authority
+          schema:
+            type: number
+        - in: query
+          name: lon
+          required: false
+          description: The longitude of the health authority
+          schema:
+            type: number
+      responses:
+        "200":
+          description: "Authorities list"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthAuthority"
+              example:
+                [
+                  {
+                    "email": "canicatti@asl.it",
+                    "name": " ASL Canicattì",
+                    "password": "cani123",
+                    "phone": "0808403849",
+                    "country": "Italy",
+                    "state": "AG",
+                    "city": "Canicattì",
+                    "lat": 37.36,
+                    "lon": 13.84,
+                  },
+                ]
+      tags:
+        - "Health Authority"
     post:
       summary: "Register a new health authority"
       description: "Register a new authority in the app"
@@ -342,7 +568,41 @@ paths:
           description: "User not found"
       tags:
         - "Health Authority"
-
+  /authorities/login:
+    post:
+      x-openapi-router-controller: microservice.api.authorities
+      operationId: login
+      summary: "Check if the health authority can login"
+      requestBody:
+        $ref: "#/components/requestBodies/login"
+      responses:
+        "200":
+          description: "Health Authority exists"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              examples:
+                "Success":
+                  value:
+                    "message": "Success"
+                "Wrong credentials":
+                  value:
+                    "message": "Wrong credentials"
+        "404":
+          description: "Health Authority does not exist"
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+              example:
+                "message": "Health Authority not found"
+      tags:
+        - "Health Authority"
   /authorities/trace:
     get:
       summary: "Trace an user"
@@ -490,7 +750,7 @@ components:
           description: Password of the Health Authority account
           maxLength: 128
           example: password
-        phone:
+        phonenumber:
           type: string
           description: The phone number of the Health Authority
           maxLength: 40
@@ -533,3 +793,23 @@ components:
           minimum: 1
           maximum: 60
           example: "10"
+
+  securitySchemes:
+    basicAuth: # <-- arbitrary name for the security scheme
+      type: http
+      scheme: basic
+
+  requestBodies:
+    login:
+      required: true
+      content:
+        application/json:
+          schema:
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+          example:
+            email: "marioexample@mail.com"
+            password: "ekjc39rf$nj"

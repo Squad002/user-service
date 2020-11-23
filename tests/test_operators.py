@@ -128,6 +128,45 @@ def test_delete_should_not_be_successful(client):
     assert res.status_code == 404
 
 
+def test_login_should_be_successful(client):
+    client.post(
+        "/operators",
+        json=operator,
+    )
+
+    res = client.post(
+        "/operators/login",
+        json={"email": operator["email"], "password": operator["password"]},
+    )
+
+    assert res.status_code == 200
+    assert res.json["message"] == "Success"
+
+
+def test_login_should_be_wrong_credentials(client):
+    client.post(
+        "/operators",
+        json=operator,
+    )
+
+    res = client.post(
+        "/operators/login", json={"email": operator["email"], "password": "wrongpass"}
+    )
+
+    assert res.status_code == 200
+    assert res.json["message"] == "Wrong credentials"
+
+
+def test_login_should_be_operator_not_found(client):
+    res = client.post(
+        "/operators/login",
+        json={"email": operator["email"], "password": operator["password"]},
+    )
+
+    assert res.status_code == 404
+    assert res.json["message"] == "Operator not found"
+
+
 # Helpers
 
 operator = dict(
