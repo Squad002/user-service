@@ -1,6 +1,8 @@
-from microservice import create_app
-from dotenv import load_dotenv
+from flask import request
+from microservice import create_app, db
 from microservice.services import mock
+from microservice.models import User, Operator, HealthAuthority, Mark
+from dotenv import load_dotenv
 
 import os
 
@@ -17,3 +19,19 @@ app.logger.info("Booting finished")
 def deploy():
     """Run deployment tasks."""
     mock.everything()
+
+
+@app.route("/testing/services/user/db", methods=["GET", "DELETE"])
+def delete_db():
+    if request.method == "GET":
+        return "Available", 204
+    elif request.method == "DELETE":
+        db.session.query(User).delete()
+        db.session.query(Operator).delete()
+        db.session.query(HealthAuthority).delete()
+        db.session.query(Mark).delete()
+        db.session.commit()
+
+        return "OK", 204
+
+    return "Error", 404

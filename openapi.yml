@@ -501,7 +501,7 @@ paths:
                     "email": "canicatti@asl.it",
                     "name": " ASL Canicattì",
                     "password": "cani123",
-                    "phone": "0808403849",
+                    "phonenumber": "0808403849",
                     "country": "Italy",
                     "state": "AG",
                     "city": "Canicattì",

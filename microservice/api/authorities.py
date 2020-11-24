@@ -80,7 +80,7 @@ def post():
             email=authority["email"],
             name=authority["name"],
             password=authority["password"],
-            phone=authority["phone"],
+            phonenumber=authority["phonenumber"],
             country=authority["country"],
             state=authority["state"],
             city=authority["city"],

@@ -14,7 +14,7 @@ def test_post_should_be_successful(client, db):
     assert res.status_code == 201
     assert q.name == authority["name"]
     assert q.email == authority["email"]
-    assert q.phone == authority["phone"]
+    assert q.phonenumber == authority["phonenumber"]
     assert q.country == authority["country"]
     assert q.city == authority["city"]
     assert q.state == authority["state"]
@@ -84,7 +84,7 @@ authority = {
     "email": "authority@gmail.com",
     "name": "ASL Pisa",
     "password": "password",
-    "phone": "+39 33133133130",
+    "phonenumber": "+39 33133133130",
     "country": "Italy",
     "state": "Tuscany",
     "city": "Pisa",

@@ -178,7 +178,7 @@ def health_authority():
         example.name = "Admin"
         example.email = "auth@mail.com"
         example.password = "admin"
-        example.phone = 3330049383
+        example.phonenumber = 3330049383
         example.country = "Italy"
         db.session.add(example)
         db.session.commit()

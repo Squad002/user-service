@@ -1,13 +1,12 @@
 from connexion.resolver import RestyResolver
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+
 from config import config
 
 import connexion
 
 
 db = SQLAlchemy()
-login_manager = LoginManager()
 
 
 def create_app(config_name, updated_variables=None):
@@ -29,7 +28,6 @@ def create_app(config_name, updated_variables=None):
 
     db.init_app(flask_app)
     db.create_all(app=flask_app)
-    login_manager.init_app(flask_app)
 
     # Load APIs
     connexion_app.add_api("openapi.yml", resolver=RestyResolver("microservice.api"))
