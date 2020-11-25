@@ -5,8 +5,7 @@ from microservice import db
 
 import requests
 
-from datetime import date
-
+from datetime import date, datetime, time, timedelta
 
 # Methods
 
@@ -335,8 +334,10 @@ table3 = {"name": "C10", "seats": 10, "restaurant_id": 1}
 booking1 = {
     "user_id": 1,
     "restaurant_id": 1,
-    "start_booking": "2020-11-05 10:30",
-    "end_booking": "2020-11-05 12:00",
+    "start_booking": datetime.now().strftime("%Y-%m-%d %H:%M"),
+    "end_booking": (datetime.now() + timedelta(hours=2, minutes=30)).strftime(
+        "%Y-%m-%d %H:%M"
+    ),
     "confirmed_booking": True,
     "seats": 1,
 }
@@ -344,8 +345,10 @@ booking1 = {
 booking2 = {
     "user_id": 2,
     "restaurant_id": 1,
-    "start_booking": "2020-11-05 10:30",
-    "end_booking": "2020-11-05 12:00",
+    "start_booking": datetime.now().strftime("%Y-%m-%d %H:%M"),
+    "end_booking": (datetime.now() + timedelta(hours=2, minutes=30)).strftime(
+        "%Y-%m-%d %H:%M"
+    ),
     "confirmed_booking": False,
     "seats": 2,
 }
@@ -365,8 +368,10 @@ booking2_confirm = {
 booking3 = {
     "user_id": 3,
     "restaurant_id": 1,
-    "start_booking": "2020-11-05 10:30",
-    "end_booking": "2020-11-05 12:00",
+    "start_booking": datetime.now().strftime("%Y-%m-%d %H:%M"),
+    "end_booking": (datetime.now() + timedelta(hours=2, minutes=30)).strftime(
+        "%Y-%m-%d %H:%M"
+    ),
     "confirmed_booking": True,
     "seats": 1,
 }
@@ -374,6 +379,10 @@ booking3 = {
 booking4 = {
     "user_id": 4,
     "restaurant_id": 1,
+    "start_booking": (datetime.now() + timedelta(hours=2, minutes=30)).strftime(
+        "%Y-%m-%d %H:%M"
+    ),
+    "end_booking": (datetime.now() + timedelta(hours=5)).strftime("%Y-%m-%d %H:%M"),
     "start_booking": "2020-11-05 12:00",
     "end_booking": "2020-11-05 14:30",
     "confirmed_booking": True,
@@ -383,8 +392,8 @@ booking4 = {
 booking5 = {
     "user_id": 5,
     "restaurant_id": 1,
-    "start_booking": "2020-11-05 09:30",
-    "end_booking": "2020-11-05 12:00",
+    "start_booking": (datetime.now() - timedelta(hours=2, minutes=30)).strftime("%Y-%m-%d %H:%M"),
+    "end_booking": datetime.now().strftime("%Y-%m-%d %H:%M"),
     "confirmed_booking": True,
     "seats": 1,
 }

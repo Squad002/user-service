@@ -139,13 +139,10 @@ def test_should_mark_one_user_through_phonenumber(client, db):
 
 
 def test_should_trace_one_user_through_phonenumber(client, db):
-    res = client.post(
-        "/authorities/1/mark",
+    res = client.get(
+        "/authorities/1/trace",
         json={"identifier": user1["phonenumber"], "duration": 15},
         follow_redirects=False,
     )
 
-    q = User.query.filter_by(id=1).first()
-
-    assert q.marked
-    assert res.status_code == 204
+    assert res.status_code == 200

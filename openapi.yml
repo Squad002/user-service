@@ -609,7 +609,7 @@ paths:
                   },
                 ]
         "404":
-          description: "Operator not found"
+          description: "User not found"
       tags:
         - "Health Authority"
   /authorities/{id}/mark:

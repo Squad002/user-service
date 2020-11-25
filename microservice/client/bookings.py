@@ -6,7 +6,7 @@ import requests
 
 @read_request_breaker
 def get_bookings_by_user_id(user_id):
-    res = requests.post(
+    res = requests.get(
         f"{current_app.config['URL_API_BOOKING']}bookings?user_id={user_id}",
         timeout=(
             current_app.config["READ_TIMEOUT"],

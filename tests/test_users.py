@@ -1,5 +1,5 @@
 from tests.fixtures import app, client, db
-from tests.helpers import user1, user2, user_not_written
+from tests.helpers import user1, user_not_written
 
 from microservice.models import User
 

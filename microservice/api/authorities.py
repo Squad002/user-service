@@ -69,7 +69,7 @@ def mark(id):
         # ok 200 Todo check if marked else "already", 200
 
         if user_to_mark.marked:
-            pass  # TODO
+            pass
         else:
             mark_helper(authority, user_to_mark, duration, datetime.utcnow())
             return Response(status=204, mimetype="application/json")
@@ -77,8 +77,34 @@ def mark(id):
         return Response(status=404, mimetype="application/json")
 
 
-def trace():
-    pass
+def trace(id):
+    request.get_data()
+    identifier = request.json["identifier"]
+    duration = request.json["duration"]
+
+    user_to_trace = User.query.filter(
+        or_(
+            User.fiscalcode.like(identifier),
+            User.email.like(identifier),
+            User.phonenumber.like(identifier),
+        )
+    ).first()
+
+    if user_to_trace:
+        authority = HealthAuthority.query.filter_by(id=id).first()
+
+        if user_to_trace.marked:
+            contacts = trace_contacts(user_to_trace, duration, send_email=False)
+            return Response(contacts, status=200, mimetype="application/json")
+        else:
+            mark_helper(authority, user_to_trace, duration, datetime.utcnow())
+            return Response(
+                [],
+                status=200,
+                mimetype="application/json",
+            )
+    else:
+        return Response(status=404, mimetype="application/json")
 
 
 def post():
@@ -153,7 +179,7 @@ def trace_contacts(user, interval, send_email=False):
         today = datetime.utcnow()
         user_bookings = list(
             filter(
-                lambda x: datetime.strptime(x["start_booking"], "%Y-%m-%d %H:%M")
+                lambda x: datetime.strptime(x["start_booking"], "%Y-%m-%dT%H:%M:%SZ")
                 >= (today - timedelta(days=interval)),
                 user_bookings,
             )
@@ -162,7 +188,7 @@ def trace_contacts(user, interval, send_email=False):
         for user_booking in user_bookings:
             contacts_temp = []
             starting_time = datetime.strptime(
-                user_booking["start_booking"], "%Y-%m-%d %H:%M"
+                user_booking["start_booking"], "%Y-%m-%dT%H:%M:%SZ"
             )
             restaurant = client.get_restaurant_by_id(user_booking["restaurant_id"])
             operator = (
@@ -224,7 +250,12 @@ def trace_contacts(user, interval, send_email=False):
                             )
 
                 if contacts_temp:
-                    contacts.append({"date": starting_time, "people": contacts_temp})
+                    contacts.append(
+                        {
+                            "date": starting_time.strftime("%Y-%m-%d"),
+                            "people": contacts_temp,
+                        }
+                    )
             elif starting_time >= datetime.utcnow() and send_email:
                 # Alert the operator about the future booking
                 table = client.get_table_by_id(user_booking["table_id"])
