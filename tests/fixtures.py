@@ -1,7 +1,10 @@
 from microservice import create_app, db as dba
+from tests import helpers
 
 import pytest
 import os
+
+import requests
 
 
 @pytest.yield_fixture
@@ -13,6 +16,7 @@ def app(testrun_uid):
         },
     )
     db_path = os.path.join(app.root_path, f"gooutsafe_test_{testrun_uid}.db")
+    helpers.generate_all()
 
     yield app
 
@@ -20,6 +24,10 @@ def app(testrun_uid):
     dba.session.remove()
     dba.drop_all(app=app)
     os.unlink(db_path)
+
+    # Teardown DBs on the microservices
+    res = requests.delete("http://localhost:5002/testing/services/restaurant/db")
+    res = requests.delete("http://localhost:5003/testing/services/booking/db")
 
 
 @pytest.fixture

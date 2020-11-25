@@ -1,10 +1,18 @@
 from microservice import db
-from microservice.models import HealthAuthority, User
+from microservice.models import HealthAuthority, User, Operator
+from microservice import client
 from connexion import request
 from flask import Response
 from sqlalchemy import or_
-from datetime import datetime
+from datetime import datetime, timedelta
 from json import dumps
+
+from config import (
+    mail_body_covid_19_contact,
+    mail_body_covid_19_mark,
+    mail_body_covid_19_operator_alert,
+    mail_body_covid_19_operator_booking_alert,
+)
 
 
 def get():
@@ -43,23 +51,28 @@ def search():
     return Response(authorities, status=200, mimetype="application/json")
 
 
-def mark(authority_id):
+def mark(id):
     request.get_data()
     identifier = request.json["identifier"]
     duration = request.json["duration"]
 
     user_to_mark = User.query.filter(
         or_(
-            User.fiscal_code.like(identifier),
+            User.fiscalcode.like(identifier),
             User.email.like(identifier),
-            User.phone_number.like(identifier),
+            User.phonenumber.like(identifier),
         )
-    )
+    ).first()
 
     if user_to_mark:
-        authority = HealthAuthority.query.filter_by(id == authority_id)
-        mark(authority, user_to_mark, duration, datetime.utcnow())
-        return Response()
+        authority = HealthAuthority.query.filter_by(id=id).first()
+        # ok 200 Todo check if marked else "already", 200
+
+        if user_to_mark.marked:
+            pass  # TODO
+        else:
+            mark_helper(authority, user_to_mark, duration, datetime.utcnow())
+            return Response(status=204, mimetype="application/json")
     else:
         return Response(status=404, mimetype="application/json")
 
@@ -116,76 +129,115 @@ def login():
         )
 
 
-# def mark(current_authority, user, duration, starting_date):
-#     # Authority mark user
-#     current_authority.mark(user, duration, starting_date=starting_date)
-#     db.session.commit()
-#     tasks.send_email(
-#         "You are positive to COVID-19",
-#         [user.email],
-#         mail_body_covid_19_mark.format(
-#             user.firstname,
-#             starting_date.strftime("%A %d. %B %Y"),
-#             current_authority.name,
-#         ),
-#     )
-#     trace_contacts(user, duration, send_email=True)
+def mark_helper(current_authority, user, duration, starting_date):
+    current_authority.mark(user, duration, starting_date=starting_date)  # todo
+    db.session.commit()
+    client.send_email(
+        "You are positive to COVID-19",
+        [user.email],
+        mail_body_covid_19_mark.format(
+            user.firstname,
+            starting_date.strftime("%A %d. %B %Y"),
+            current_authority.name,
+        ),
+    )
+    trace_contacts(user, duration, send_email=False)  # todo set to true
 
 
-# def trace_contacts(user, interval, send_email=False):
-#     contacts = []
-#     if user.is_marked():
-#         user_bookings = user.get_bookings(range_duration=interval)
+def trace_contacts(user, interval, send_email=False):
+    contacts = []
+    if user.marked:
+        user_bookings = client.get_bookings_by_user_id(user.id)
 
-#         for user_booking in user_bookings:
-#             contacts_temp = []
-#             starting_time = user_booking.start_booking
-#             restaurant = user_booking.table.restaurant
-#             operator = restaurant.operator
+        # Get all the starting bookings, from today to "interval" days ago
+        today = datetime.utcnow()
+        user_bookings = list(
+            filter(
+                lambda x: datetime.strptime(x["start_booking"], "%Y-%m-%d %H:%M")
+                >= (today - timedelta(days=interval)),
+                user_bookings,
+            )
+        )
 
-#             if user_booking.checkin:
-#                 # Alert the operator about the past booking
-#                 if send_email:
-#                     tasks.send_email(
-#                         f"You had a COVID-19 positive case in your restaurant {restaurant.name}",
-#                         [operator.email],
-#                         mail_body_covid_19_operator_alert.format(
-#                             operator.firstname,
-#                             starting_time.strftime("%A %d. %B %Y"),
-#                             restaurant.name,
-#                         ),
-#                     )
+        for user_booking in user_bookings:
+            contacts_temp = []
+            starting_time = datetime.strptime(
+                user_booking["start_booking"], "%Y-%m-%d %H:%M"
+            )
+            restaurant = client.get_restaurant_by_id(user_booking["restaurant_id"])
+            operator = (
+                db.session.query(Operator).filter_by(restaurant["operator_id"]).first()
+            )
 
-#                 # Check for possible contacts with other people
-#                 restaurant_bookings = restaurant.get_bookings(starting_time)
-#                 for b in restaurant_bookings:
-#                     if b.user != user:
-#                         contacts_temp.append(b.user)
-#                         if not b.user.is_marked() and send_email:
-#                             # Alert only the people that are not marked about the possible contact
-#                             tasks.send_email(
-#                                 "Possible contact with a COVID-19 positive case",
-#                                 [b.user.email],
-#                                 mail_body_covid_19_contact.format(
-#                                     b.user.firstname,
-#                                     starting_time.strftime("%A %d. %B %Y"),
-#                                     restaurant.name,
-#                                 ),
-#                             )
+            if user_booking["checking"]:
+                # Alert the operator about covid-positive people that had a booking in the past
+                if send_email:
+                    client.send_email(
+                        f"You had a COVID-19 positive case in your restaurant {restaurant['name']}",
+                        [operator.email],
+                        mail_body_covid_19_operator_alert.format(
+                            operator.firstname,
+                            starting_time.strftime("%A %d. %B %Y"),
+                            restaurant["name"],
+                        ),
+                    )
 
-#                 if contacts_temp:
-#                     contacts.append({"date": starting_time, "people": contacts_temp})
-#             elif starting_time >= datetime.utcnow() and send_email:
-#                 # Alert the operator about the future booking
-#                 tasks.send_email(
-#                     f"You have a booking of a COVID-19 positive case in your restaurant {restaurant.name}",
-#                     [operator.email],
-#                     mail_body_covid_19_operator_booking_alert.format(
-#                         operator.firstname,
-#                         restaurant.name,
-#                         user_booking.id,
-#                         user_booking.table.name,
-#                     ),
-#                 )
+                # Check for possible contacts with other people
 
-#     return contacts
+                # Get all the bookings that were confirmed starting from a specific time (starting_time)
+                restaurant_bookings = client.get_bookings_by_restaurant_id(
+                    restaurant["id"]
+                )
+
+                real_bookings = []
+                tables = client.get_tables_by_restaurant_id(restaurant["id"])
+                for table in tables:
+                    bookings = []
+
+                    table_bookings = client.get_bookings_by_table_id(table["id"])
+                    for b in table_bookings:
+                        if (
+                            b["checking"]
+                            and datetime.strptime(b["start_booking"], "%Y-%m-%d %H:%M")
+                            == starting_time
+                        ):
+                            bookings.append(b)
+
+                    real_bookings.extend(bookings)
+
+                # Check if the users of the real bookings were having a meal during the same time of the marked user
+                for b in restaurant_bookings:
+                    if b["user_id"] != user.id:
+                        contact = User.query.filter_by(id=b["user_id"])
+                        contacts_temp.append(contact)
+
+                        # Alert only the people that are not marked about the possible contact
+                        if not contact.marked and send_email:
+                            client.send_email(
+                                "Possible contact with a COVID-19 positive case",
+                                [contact.email],
+                                mail_body_covid_19_contact.format(
+                                    contact.firstname,
+                                    starting_time.strftime("%A %d. %B %Y"),
+                                    restaurant["name"],
+                                ),
+                            )
+
+                if contacts_temp:
+                    contacts.append({"date": starting_time, "people": contacts_temp})
+            elif starting_time >= datetime.utcnow() and send_email:
+                # Alert the operator about the future booking
+                table = client.get_table_by_id(user_booking["table_id"])
+
+                client.send_email(
+                    f"You have a booking of a COVID-19 positive case in your restaurant {restaurant.name}",
+                    [operator.email],
+                    mail_body_covid_19_operator_booking_alert.format(
+                        operator.firstname,
+                        restaurant["name"],
+                        user_booking["booking_number"],
+                        table["name"],
+                    ),
+                )
+
+    return contacts

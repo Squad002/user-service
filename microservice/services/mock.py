@@ -39,10 +39,10 @@ def users(n=50):
             profile["last_name"] = fake.last_name()
 
             # Generate fiscal code
-            fiscal_code = None
-            while fiscal_code is None:
+            fiscalcode = None
+            while fiscalcode is None:
                 try:
-                    fiscal_code = cf.encode(
+                    fiscalcode = cf.encode(
                         name=profile["first_name"],
                         surname=profile["last_name"],
                         sex=profile["sex"],
@@ -57,10 +57,10 @@ def users(n=50):
                     email=profile["mail"],
                     firstname=profile["first_name"],
                     lastname=profile["last_name"],
-                    phonenumber=fake.phone_number().replace(" ", ""),
+                    phonenumber=fake.phonenumber().replace(" ", ""),
                     password=fake.password(length=fake.pyint(8, 24)),
                     birthdate=profile["birthdate"],
-                    fiscalcode=fiscal_code,
+                    fiscalcode=fiscalcode,
                 )
             )
 
@@ -112,10 +112,10 @@ def operators(n=50):
             profile["last_name"] = fake.last_name()
 
             # Generate fiscal code
-            fiscal_code = None
-            while fiscal_code is None:
+            fiscalcode = None
+            while fiscalcode is None:
                 try:
-                    fiscal_code = cf.encode(
+                    fiscalcode = cf.encode(
                         name=profile["first_name"],
                         surname=profile["last_name"],
                         sex=profile["sex"],
@@ -130,10 +130,10 @@ def operators(n=50):
                     email=profile["mail"],
                     firstname=profile["first_name"],
                     lastname=profile["last_name"],
-                    phonenumber=fake.phone_number().replace(" ", ""),
+                    phonenumber=fake.phonenumber().replace(" ", ""),
                     password=fake.password(length=fake.pyint(8, 24)),
                     birthdate=profile["birthdate"],
-                    fiscalcode=fiscal_code,
+                    fiscalcode=fiscalcode,
                 )
             )
 

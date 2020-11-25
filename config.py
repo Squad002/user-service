@@ -10,11 +10,22 @@ fileHandler.setFormatter(
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY") or "top secret"
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI") or "sqlite:///../gooutsafe.db"
+    SQLALCHEMY_DATABASE_URI = (
+        os.environ.get("DATABASE_URI") or "sqlite:///../gooutsafe.db"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # https://avatars.dicebear.com/api/avataaars/roma%20molesta.svg
     AVATAR_PROVIDER = "https://avatars.dicebear.com/api/avataaars/{seed}.svg"
+
+    # Services
+    URL_API_BOOKING = os.environ.get("URL_API_BOOKING") or "http://localhost:5002/"
+    URL_API_RESTAURANT = (
+        os.environ.get("URL_API_RESTAURANT") or "http://localhost:5003/"
+    )
+    URL_API_CELERY = os.environ.get("URL_API_CELERY") or "http://localhost:5004"
+    READ_TIMEOUT = os.environ.get("READ_TIMEOUT") or 3.05
+    WRITE_TIMEOUT = os.environ.get("WRITE_TIMEOUT") or 9.1
 
     @staticmethod
     def init_app(app):

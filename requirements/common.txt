@@ -5,3 +5,4 @@ Python-dotenv==0.15.0
 Pymysql==0.10.1
 Python-codicefiscale==0.3.7
 Faker==4.16.0
+pybreaker==0.6.0 

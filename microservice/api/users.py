@@ -5,6 +5,8 @@ from flask.json import dumps
 from connexion import request
 from datetime import datetime
 
+from sqlalchemy import func
+
 
 def search():
     request.get_data()
@@ -12,7 +14,7 @@ def search():
 
     query = db.session.query(User)
     for attr, value in req_data.items():
-        query = query.filter(getattr(User, attr) == value)
+        query = query.filter(func.lower(getattr(User, attr)) == value.lower())
 
     users = dumps(
         [
@@ -52,6 +54,7 @@ def post():
             fiscalcode=user["fiscalcode"],
         )
 
+        new_user.update_avatar_seed()
         db.session.add(new_user)
         db.session.commit()
         return Response(status=201)
@@ -83,6 +86,22 @@ def get(id):
         )
 
     return Response(status=404)
+
+
+def put():
+    request.get_data()
+    user = request.json
+
+    user_db = db.session.query(User.id).filter_by(email=user["email"]).first()
+    user_db = User() if not user_db else user_db
+
+    for k, v in user.items():
+        setattr(user_db, k, v)
+
+    user_db.update_avatar_seed()
+    db.session.add(user_db)
+    db.session.commit()
+    return Response(status=204)
 
 
 def patch(id):

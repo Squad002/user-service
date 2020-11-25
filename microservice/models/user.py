@@ -8,25 +8,28 @@ class User(AbstractUser):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     avatar_id = db.Column(db.Unicode(128))
 
-    firstname = db.Column(db.Unicode(128), nullable=False)
+    firstname = db.Column(db.Unicode(128))
     lastname = db.Column(db.Unicode(128))
     password_hash = db.Column(db.Unicode(128))
     fiscalcode = db.Column(db.Unicode(128))
     email = db.Column(db.Unicode(128))
     phonenumber = db.Column(db.Unicode(40))
-    birthdate = db.Column(db.DateTime)
+    birthdate = db.Column(db.Date)
 
     marks = db.relationship("Mark", back_populates="user")
-    # booking = db.relationship("Booking", back_populates="user")
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
 
+    def update_avatar_seed(self):
         from hashlib import sha1
         from base64 import b32encode
 
-        hashed = sha1((datetime.utcnow().isoformat() + self.firstname).encode("utf-8"))
-        self.avatar_id = b32encode(hashed.digest()).decode("utf-8")
+        if self.firstname:
+            hashed = sha1(
+                (datetime.utcnow().isoformat() + self.firstname).encode("utf-8")
+            )
+            self.avatar_id = b32encode(hashed.digest()).decode("utf-8")
 
     def has_been_marked(self) -> bool:
         """Returns weather the user has been marked in the past or is currently marked.
@@ -43,7 +46,7 @@ class User(AbstractUser):
         Returns:
             bool: boolean value
         """
-        return str(self.has_been_marked() and self.get_remaining_mark_days() > 0)
+        return self.has_been_marked() and self.get_remaining_mark_days() > 0
 
     def get_last_mark(self):
         """

@@ -12,7 +12,7 @@ class Operator(AbstractUser):
     fiscalcode = db.Column(db.Unicode(128))
     email = db.Column(db.Unicode(128), nullable=False)
     phonenumber = db.Column(db.Unicode(40))
-    birthdate = db.Column(db.DateTime)
+    birthdate = db.Column(db.Date)
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
