@@ -156,7 +156,7 @@ def login():
 
 
 def mark_helper(current_authority, user, duration, starting_date):
-    current_authority.mark(user, duration, starting_date=starting_date)  # todo
+    current_authority.mark(user, duration, starting_date=starting_date)
     db.session.commit()
     client.send_email(
         "You are positive to COVID-19",
@@ -167,7 +167,7 @@ def mark_helper(current_authority, user, duration, starting_date):
             current_authority.name,
         ),
     )
-    trace_contacts(user, duration, send_email=False)  # todo set to true
+    trace_contacts(user, duration, send_email=True)
 
 
 def trace_contacts(user, interval, send_email=False):

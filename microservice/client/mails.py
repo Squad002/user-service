@@ -9,7 +9,7 @@ def send_email(title, body, recipients):
     res = requests.post(
         f"{current_app.config['URL_API_BOOKING']}mails/{id}",
         json={
-            "sender": "gooutsafe-no-reply@mail.com",
+            "sender": "gooutsafe.squad2@gmail.com",
             "html_body": body,
             "recipients": recipients,
             "subject": title,
