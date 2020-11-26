@@ -72,6 +72,7 @@ paths:
                 [
                   {
                     "id": 5,
+                    "avatar_id": "fk38uf34f4484",
                     "email": "mariorossi@example.com",
                     "firstname": "Mario",
                     "lastname": "Rossi",
@@ -82,6 +83,7 @@ paths:
                   },
                   {
                     "id": 7,
+                    "avatar_id": "k2389443jkf34",
                     "email": "caiomaio@example.com",
                     "firstname": "Caio",
                     "lastname": "Maio",

@@ -64,6 +64,9 @@ def users(n=50):
                 )
             )
 
+            for user in users:
+                user.update_avatar_seed()
+
         db.session.add_all(users)
         db.session.commit()
 
@@ -80,6 +83,7 @@ def default_user():
             phonenumber=3330049382,
             birthdate=datetime.datetime(2020, 10, 5),
         )
+        example.update_avatar_seed()
         db.session.add(example)
         example = User(
             email="gino@pasticcino.com",
@@ -89,6 +93,7 @@ def default_user():
             phonenumber=3330049381,
             birthdate=datetime.datetime(2020, 10, 5),
         )
+        example.update_avatar_seed()
         db.session.add(example)
         db.session.commit()
 

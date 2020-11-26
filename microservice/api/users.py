@@ -21,6 +21,7 @@ def search():
             user.serialize(
                 [
                     "id",
+                    "avatar_id",
                     "firstname",
                     "lastname",
                     "email",
