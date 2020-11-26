@@ -22,11 +22,11 @@ class User(AbstractUser):
         super().__init__(*args, **kw)
 
     def update_avatar_seed(self):
-        from hashlib import sha1
+        from hashlib import sha256
         from base64 import b32encode
 
         if self.firstname:
-            hashed = sha1(
+            hashed = sha256(
                 (datetime.utcnow().isoformat() + self.firstname).encode("utf-8")
             )
             self.avatar_id = b32encode(hashed.digest()).decode("utf-8")

@@ -1,8 +1,10 @@
 from tests.fixtures import app, client, db
 
-from tests.helpers import user1, health_authority_not_written
+from tests.helpers import user1, health_authority_not_written, user2
 
 from microservice.models import HealthAuthority, User
+
+import datetime
 
 # Registration
 
@@ -145,4 +147,10 @@ def test_should_trace_one_user_through_phonenumber(client, db):
         follow_redirects=False,
     )
 
+    date = res.json[0]["date"]
+    user = res.json[0]["people"][0]
+
+    assert date == datetime.date.today().strftime("%Y-%m-%d")
+    assert user["email"] == user2["email"]
+    # TODO user3
     assert res.status_code == 200

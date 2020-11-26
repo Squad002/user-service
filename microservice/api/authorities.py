@@ -2,7 +2,7 @@ from microservice import db
 from microservice.models import HealthAuthority, User, Operator
 from microservice import client
 from connexion import request
-from flask import Response
+from flask import Response, jsonify
 from sqlalchemy import or_
 from datetime import datetime, timedelta
 from json import dumps
@@ -95,7 +95,7 @@ def trace(id):
 
         if user_to_trace.marked:
             contacts = trace_contacts(user_to_trace, duration, send_email=False)
-            return Response(contacts, status=200, mimetype="application/json")
+            return Response(dumps(contacts), status=200, mimetype="application/json")
         else:
             mark_helper(authority, user_to_trace, duration, datetime.utcnow())
             return Response(
@@ -192,10 +192,12 @@ def trace_contacts(user, interval, send_email=False):
             )
             restaurant = client.get_restaurant_by_id(user_booking["restaurant_id"])
             operator = (
-                db.session.query(Operator).filter_by(restaurant["operator_id"]).first()
+                db.session.query(Operator)
+                .filter_by(id=restaurant["operator_id"])
+                .first()
             )
 
-            if user_booking["checking"]:
+            if user_booking["checkin"]:
                 # Alert the operator about covid-positive people that had a booking in the past
                 if send_email:
                     client.send_email(
@@ -223,8 +225,10 @@ def trace_contacts(user, interval, send_email=False):
                     table_bookings = client.get_bookings_by_table_id(table["id"])
                     for b in table_bookings:
                         if (
-                            b["checking"]
-                            and datetime.strptime(b["start_booking"], "%Y-%m-%d %H:%M")
+                            b["checkin"]
+                            and datetime.strptime(
+                                b["start_booking"], "%Y-%m-%dT%H:%M:%SZ"
+                            )
                             == starting_time
                         ):
                             bookings.append(b)
@@ -234,8 +238,21 @@ def trace_contacts(user, interval, send_email=False):
                 # Check if the users of the real bookings were having a meal during the same time of the marked user
                 for b in restaurant_bookings:
                     if b["user_id"] != user.id:
-                        contact = User.query.filter_by(id=b["user_id"])
-                        contacts_temp.append(contact)
+                        contact = User.query.filter_by(id=b["user_id"]).first()
+                        contacts_temp.append(
+                            contact.serialize(
+                                [
+                                    "id",
+                                    "firstname",
+                                    "lastname",
+                                    "email",
+                                    "fiscalcode",
+                                    "phonenumber",
+                                    "marked",
+                                    "is_registered",
+                                ]
+                            )
+                        )
 
                         # Alert only the people that are not marked about the possible contact
                         if not contact.marked and send_email:

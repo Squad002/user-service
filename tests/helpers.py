@@ -78,6 +78,31 @@ def generate_all():
             current_app.config["WRITE_TIMEOUT"],
         ),
     )
+    requests.post(
+        f"{current_app.config['URL_API_RESTAURANT']}tables",
+        json=table4,
+        timeout=(
+            current_app.config["READ_TIMEOUT"],
+            current_app.config["WRITE_TIMEOUT"],
+        ),
+    )
+
+    requests.post(
+        f"{current_app.config['URL_API_RESTAURANT']}tables",
+        json=table5,
+        timeout=(
+            current_app.config["READ_TIMEOUT"],
+            current_app.config["WRITE_TIMEOUT"],
+        ),
+    )
+    requests.post(
+        f"{current_app.config['URL_API_RESTAURANT']}tables",
+        json=table6,
+        timeout=(
+            current_app.config["READ_TIMEOUT"],
+            current_app.config["WRITE_TIMEOUT"],
+        ),
+    )
 
     # Booking and checkins
     requests.post(
@@ -320,7 +345,7 @@ restaurant1 = dict(
     cuisine_type="ETHNIC",
     opening_hours=10,
     closing_hours=24,
-    operator_id=6,
+    operator_id=1,
     average_rating=3.7,
     precautions=["Amuchina", "Social distancing"],
 )
@@ -330,6 +355,12 @@ table1 = {"name": "A4", "seats": 4, "restaurant_id": 1}
 table2 = {"name": "B10", "seats": 10, "restaurant_id": 1}
 
 table3 = {"name": "C10", "seats": 10, "restaurant_id": 1}
+
+table4 = {"name": "D10", "seats": 10, "restaurant_id": 1}
+
+table5 = {"name": "E10", "seats": 10, "restaurant_id": 1}
+
+table6 = {"name": "F10", "seats": 10, "restaurant_id": 1}
 
 booking1 = {
     "user_id": 1,
@@ -392,7 +423,9 @@ booking4 = {
 booking5 = {
     "user_id": 5,
     "restaurant_id": 1,
-    "start_booking": (datetime.now() - timedelta(hours=2, minutes=30)).strftime("%Y-%m-%d %H:%M"),
+    "start_booking": (datetime.now() - timedelta(hours=2, minutes=30)).strftime(
+        "%Y-%m-%d %H:%M"
+    ),
     "end_booking": datetime.now().strftime("%Y-%m-%d %H:%M"),
     "confirmed_booking": True,
     "seats": 1,
